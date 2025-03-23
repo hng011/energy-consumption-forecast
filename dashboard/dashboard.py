@@ -32,9 +32,9 @@ st.markdown("### Enter the details below to predict the energy consumption.")
 
 
 building_type = st.selectbox("Building Type", ["Residential", "Commercial", "Industrial"])
-square_footage = st.number_input("Square Footage", min_value=0, value=100000)
-occupants = st.number_input("Number of Occupants", min_value=1, value=1000)
-appliances = st.number_input("Appliances Used", min_value=1, value=100)
+square_footage = st.number_input("Square Footage", min_value=0, max_value=100000)
+occupants = st.number_input("Number of Occupants", min_value=1, max_value=1000)
+appliances = st.number_input("Appliances Used", min_value=1, max_value=1000)
 temperature = st.number_input("Average Temperature (°C)", min_value=00.0, max_value=100.0)
 day_of_week = st.selectbox("Day of Week", ["Weekday", "Weekend"])
 
