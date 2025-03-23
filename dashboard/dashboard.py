@@ -6,9 +6,9 @@ import pickle
 ep_model = "https://github.com/hng011/wok/raw/refs/heads/main/models/elasticnet_model.pkl"
 ep_scaler = "https://github.com/hng011/wok/raw/refs/heads/main/models/scaler.pkl"
 
-def fetch_model(ep, file_name):
+def fetch_model(endpoint, file_name):
     try:
-        response = requests.get(ep, stream=True)
+        response = requests.get(endpoint, stream=True)
         response.raise_for_status()
         with open(file_name, "wb") as f:
             for chunk in response.iter_content(chunk_size=8192):
@@ -32,10 +32,10 @@ st.markdown("### Enter the details below to predict the energy consumption.")
 
 
 building_type = st.selectbox("Building Type", ["Residential", "Commercial", "Industrial"])
-square_footage = st.number_input("Square Footage", min_value=0, max_value=100000)
-occupants = st.number_input("Number of Occupants", min_value=1, max_value=1000)
-appliances = st.number_input("Appliances Used", min_value=1, max_value=1000)
-temperature = st.number_input("Average Temperature (°C)", min_value=00.0, max_value=100.0)
+square_footage = st.number_input("Square Footage", min_value=0, max_value=100000, value=0)
+occupants = st.number_input("Number of Occupants", min_value=0, max_value=1000, value=0)
+appliances = st.number_input("Appliances Used", min_value=0, max_value=1000, value=0)
+temperature = st.number_input("Average Temperature (°C)", min_value=00.0, max_value=100.0, value=0.0)
 day_of_week = st.selectbox("Day of Week", ["Weekday", "Weekend"])
 
 
@@ -51,13 +51,13 @@ input_data = pd.DataFrame(
 input_data = input_data.astype("float64")
 
 # scaler
-scaler = fetch_model(ep=ep_scaler, file_name="scaler.pkl")
+scaler = fetch_model(endpoint=ep_scaler, file_name="scaler.pkl")
 input_data = scaler.transform(input_data)
 
 
 # Predict Energy Consumption
 if st.button("Predict Energy Consumption"):
-    model = fetch_model(ep=ep_model, file_name="model.pkl")
+    model = fetch_model(endpoint=ep_model, file_name="model.pkl")
     predicted_energy = model.predict(input_data)[0]
     st.subheader("🔮 Prediction Result")
     st.write(f"### Predicted Energy Consumption: {predicted_energy:.2f}")
