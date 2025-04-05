@@ -8,8 +8,10 @@ models = [
     "https://github.com/hng011/wok/raw/refs/heads/dev/models/model_linreg_fnb1.joblib"
 ]
 
-scaler = "https://github.com/hng011/wok/raw/refs/heads/dev/models/scaler_minmax_fnb1.joblib"
-
+scalers = [
+    "https://github.com/hng011/wok/raw/refs/heads/dev/models/scaler_minmax_fnb1.joblib",
+    
+]
 def fetch_model(endpoint, file_name):
     try:
         response = requests.get(endpoint, stream=True)
