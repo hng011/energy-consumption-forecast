@@ -1,10 +1,14 @@
 import streamlit as st
 import pandas as pd
 import requests
-import pickle
+import joblib
 
-ep_model = "https://github.com/hng011/wok/raw/refs/heads/main/models/elasticnet_model.pkl"
-ep_scaler = "https://github.com/hng011/wok/raw/refs/heads/main/models/scaler.pkl"
+models = [
+    "https://github.com/hng011/wok/raw/refs/heads/dev/models/model_elastic_fnb1.joblib",
+    "https://github.com/hng011/wok/raw/refs/heads/dev/models/model_linreg_fnb1.joblib"
+]
+
+scaler = "https://github.com/hng011/wok/raw/refs/heads/dev/models/scaler_minmax_fnb1.joblib"
 
 def fetch_model(endpoint, file_name):
     try:
@@ -20,8 +24,7 @@ def fetch_model(endpoint, file_name):
 
     # Load the model
     try:
-        with open(file_name, "rb") as f:
-            return  pickle.load(f)            
+        return joblib.load(file_name)
     except Exception as e:
         st.error(f"Error loading model: {e}")
         st.stop()
@@ -30,34 +33,58 @@ def fetch_model(endpoint, file_name):
 st.title("Energy Consumption Prediction")
 st.markdown("### Enter the details below to predict the energy consumption.")
 
+list_bt = ["Residential", "Commercial", "Industrial"]
+list_dw = ["Weekday", "Weekend"]
 
-building_type = st.selectbox("Building Type", ["Residential", "Commercial", "Industrial"])
+building_type = st.selectbox("Building Type", list_bt)
 square_footage = st.number_input("Square Footage", min_value=0, max_value=100000, value=0)
 occupants = st.number_input("Number of Occupants", min_value=0, max_value=1000, value=0)
 appliances = st.number_input("Appliances Used", min_value=0, max_value=1000, value=0)
 temperature = st.number_input("Average Temperature (°C)", min_value=00.0, max_value=100.0, value=0.0)
-day_of_week = st.selectbox("Day of Week", ["Weekday", "Weekend"])
+day_of_week = st.selectbox("Day of Week", list_dw)
 
+# Choosing Model
+list_model = ["LinearRegression", "ElasticNet"]
+choosed_model = st.selectbox("Model", list_model)
 
-building_type_map = {'Residential': 0.347, 'Commercial': 0.336, 'Industrial': 0.317}
-day_of_week_map = {'Weekday': 0.507, 'Weekend': 0.493}
-
+data_cols = [
+        "Square Footage", 
+        "Number of Occupants", 
+        "Appliances Used", 
+        "Average Temperature", 
+        "Building Type_Commercial",
+        "Building Type_Industrial",
+        "Building Type_Residential",
+        "Day of Week_Weekday",
+        "Day of Week_Weekend"
+]
 
 input_data = pd.DataFrame(
-    data=[[building_type_map[building_type], square_footage, occupants, appliances, temperature, day_of_week_map[day_of_week]]], 
-    columns=["Building Type", "Square Footage", "Number of Occupants", "Appliances Used", "Average Temperature", "Day of Week"]
+    data=[ [square_footage, occupants, appliances, temperature, 0.0, 0.0, 0.0, 0.0, 0.0] ], 
+    columns=data_cols
 )
 
 input_data = input_data.astype("float64")
 
+# Encode
+if building_type == list_bt[0]: input_data[data_cols[6]] = 1.0
+elif building_type == list_bt[1]: input_data[data_cols[4]] = 1.0
+else: input_data[data_cols[5]] = 1.0
+
+
+if day_of_week == list_dw[0]: input_data[data_cols[-2]] = 1.0
+else: input_data[data_cols[-1]] = 1.0
+
+
 # scaler
-scaler = fetch_model(endpoint=ep_scaler, file_name="scaler.pkl")
+scaler = fetch_model(endpoint=scaler, file_name="scaler.joblib")
 input_data = scaler.transform(input_data)
 
+print(input_data)
 
 # Predict Energy Consumption
 if st.button("Predict Energy Consumption"):
-    model = fetch_model(endpoint=ep_model, file_name="model.pkl")
+    model = fetch_model(endpoint=models[0] if choosed_model == list_model[1] else models[1], file_name="model.joblib")
     predicted_energy = model.predict(input_data)[0]
     st.subheader("🔮 Prediction Result")
     st.write(f"### Predicted Energy Consumption: {predicted_energy:.2f}")
