@@ -8,10 +8,9 @@ models = [
     "https://github.com/hng011/wok/raw/refs/heads/dev/models/model_linreg_fnb1.joblib"
 ]
 
-scalers = [
-    "https://github.com/hng011/wok/raw/refs/heads/dev/models/scaler_standardscaler_fnb1.joblib",
-    "https://github.com/hng011/wok/raw/refs/heads/dev/models/scaler_minmax_fnb1.joblib",
-]
+scalers = "https://github.com/hng011/wok/raw/refs/heads/dev/models/scaler_standardscaler_fnb1.joblib",
+
+
 def fetch_model(endpoint, file_name):
     try:
         response = requests.get(endpoint, stream=True)
@@ -32,11 +31,14 @@ def fetch_model(endpoint, file_name):
         st.stop()
         
         
+st.image("https://raw.githubusercontent.com/hng011/wok/refs/heads/main/assets/banner_linreg.png")
 st.title("Energy Consumption Prediction")
 st.markdown("### Enter the details below to predict the energy consumption.")
 
+
 list_bt = ["Residential", "Commercial", "Industrial"]
 list_dw = ["Weekday", "Weekend"]
+
 
 building_type = st.selectbox("Building Type", list_bt)
 square_footage = st.number_input("Square Footage", min_value=0, max_value=100000, value=0)
@@ -45,13 +47,16 @@ appliances = st.number_input("Appliances Used", min_value=0, max_value=1000, val
 temperature = st.number_input("Average Temperature (°C)", min_value=00.0, max_value=100.0, value=0.0)
 day_of_week = st.selectbox("Day of Week", list_dw)
 
+
 # Choosing Model
 list_model = ["LinearRegression", "ElasticNet"]
 choosed_model = st.selectbox("Model", list_model)
 
+
 # Choosing Scaler
 list_scaler = ["StandardScaler", "MinMaxScaler"]
 choosed_scaler = st.selectbox("Scaler", list_scaler)
+
 
 data_cols = [
         "Square Footage", 
@@ -65,25 +70,27 @@ data_cols = [
         "Day of Week_Weekend"
 ]
 
+
 input_data = pd.DataFrame(
     data=[ [square_footage, occupants, appliances, temperature, 0.0, 0.0, 0.0, 0.0, 0.0] ], 
     columns=data_cols
 )
 
+
 input_data = input_data.astype("float64")
+
 
 # Encode
 if building_type == list_bt[0]: input_data[data_cols[6]] = 1.0
 elif building_type == list_bt[1]: input_data[data_cols[4]] = 1.0
 else: input_data[data_cols[5]] = 1.0
 
-
 if day_of_week == list_dw[0]: input_data[data_cols[-2]] = 1.0
 else: input_data[data_cols[-1]] = 1.0
 
 
 # scaler
-scaler = fetch_model(endpoint=scalers[0] if choosed_scaler == list_scaler[0] else scalers[1], file_name="scaler.joblib")
+scaler = fetch_model(endpoint=scalers, file_name="scaler.joblib")
 input_data = scaler.transform(input_data)
 
 
