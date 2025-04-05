@@ -8,7 +8,7 @@ models = [
     "https://github.com/hng011/wok/raw/refs/heads/dev/models/model_linreg_fnb1.joblib"
 ]
 
-scalers = "https://github.com/hng011/wok/raw/refs/heads/dev/models/scaler_standardscaler_fnb1.joblib"
+scaler = "https://github.com/hng011/wok/raw/refs/heads/dev/models/scaler_standardscaler_fnb1.joblib"
 
 
 def fetch_model(endpoint, file_name):
@@ -53,9 +53,9 @@ list_model = ["LinearRegression", "ElasticNet"]
 choosed_model = st.selectbox("Model", list_model)
 
 
-# Choosing Scaler
-list_scaler = ["StandardScaler", "MinMaxScaler"]
-choosed_scaler = st.selectbox("Scaler", list_scaler)
+# # Choosing Scaler
+# list_scaler = ["StandardScaler", "MinMaxScaler"]
+# choosed_scaler = st.selectbox("Scaler", list_scaler)
 
 
 data_cols = [
@@ -90,7 +90,7 @@ else: input_data[data_cols[-1]] = 1.0
 
 
 # scaler
-scaler = fetch_model(endpoint=scalers, file_name="scaler.joblib")
+scaler = fetch_model(endpoint=scaler, file_name="scaler.joblib")
 input_data = scaler.transform(input_data)
 
 
