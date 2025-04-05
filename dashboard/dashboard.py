@@ -8,7 +8,7 @@ models = [
     "https://github.com/hng011/wok/raw/refs/heads/dev/models/model_linreg_fnb1.joblib"
 ]
 
-scalers = "https://github.com/hng011/wok/raw/refs/heads/dev/models/scaler_standardscaler_fnb1.joblib",
+scalers = "https://github.com/hng011/wok/raw/refs/heads/dev/models/scaler_standardscaler_fnb1.joblib"
 
 
 def fetch_model(endpoint, file_name):
