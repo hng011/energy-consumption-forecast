@@ -1,2 +1,3 @@
 .venv
 dashboard/*.pkl
+dashboard/*.joblib
