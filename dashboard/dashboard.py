@@ -8,8 +8,10 @@ models = [
     "https://github.com/hng011/wok/raw/refs/heads/dev/models/model_linreg_fnb1.joblib"
 ]
 
-scaler = "https://github.com/hng011/wok/raw/refs/heads/dev/models/scaler_minmax_fnb1.joblib"
-
+scalers = [
+    "https://github.com/hng011/wok/raw/refs/heads/dev/models/scaler_standardscaler_fnb1.joblib",
+    "https://github.com/hng011/wok/raw/refs/heads/dev/models/scaler_minmax_fnb1.joblib",
+]
 def fetch_model(endpoint, file_name):
     try:
         response = requests.get(endpoint, stream=True)
@@ -47,6 +49,10 @@ day_of_week = st.selectbox("Day of Week", list_dw)
 list_model = ["LinearRegression", "ElasticNet"]
 choosed_model = st.selectbox("Model", list_model)
 
+# Choosing Scaler
+list_scaler = ["StandardScaler", "MinMaxScaler"]
+choosed_scaler = st.selectbox("Scaler", list_scaler)
+
 data_cols = [
         "Square Footage", 
         "Number of Occupants", 
@@ -77,14 +83,13 @@ else: input_data[data_cols[-1]] = 1.0
 
 
 # scaler
-scaler = fetch_model(endpoint=scaler, file_name="scaler.joblib")
+scaler = fetch_model(endpoint=scalers[0] if choosed_scaler == list_scaler[0] else scalers[1], file_name="scaler.joblib")
 input_data = scaler.transform(input_data)
 
-print(input_data)
 
 # Predict Energy Consumption
 if st.button("Predict Energy Consumption"):
     model = fetch_model(endpoint=models[0] if choosed_model == list_model[1] else models[1], file_name="model.joblib")
     predicted_energy = model.predict(input_data)[0]
     st.subheader("🔮 Prediction Result")
-    st.write(f"### Predicted Energy Consumption: {predicted_energy:.2f}")
+    st.write(f"### Predicted Energy Consumption (kWh): {predicted_energy:.2f}")
