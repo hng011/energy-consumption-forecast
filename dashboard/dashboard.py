@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+import re
 
 from utils import (
     load_assets
@@ -11,8 +12,10 @@ from sklearn.metrics import mean_squared_error, r2_score
 
 
 MODELS_EP = [
+        "https://github.com/hng011/energy-consumption-forecast/raw/refs/heads/main/models/model_linreg_fnb1.joblib",
         "https://github.com/hng011/energy-consumption-forecast/raw/refs/heads/main/models/model_elastic_fnb1.joblib",
-        "https://github.com/hng011/energy-consumption-forecast/raw/refs/heads/main/models/model_linreg_fnb1.joblib"
+        "https://github.com/wicaksonohanif/FGD_ATA_2425_Regression/raw/refs/heads/main/models/model_lasso.joblib",
+        
     ]
 
 SCALER_EP = "https://github.com/hng011/energy-consumption-forecast/raw/refs/heads/main/models/scaler_standardscaler_fnb1.joblib"
@@ -48,7 +51,7 @@ def forecast_page():
 
 
     # Choosing Model
-    list_model = ["LinearRegression", "ElasticNet"]
+    list_model = ["LinearRegression", "ElasticNet", "Lasso"]
     choosed_model = st.selectbox("Model", list_model)
 
 
@@ -91,40 +94,51 @@ def forecast_page():
 
     # Predict Energy Consumption
     if st.button("Predict Energy Consumption"):
-        model = models[0] if choosed_model == list_model[1] else models[1]
+        model = models[0] if choosed_model == list_model[0] else models[1]
         predicted_energy = model.predict(input_data)[0]
         st.subheader("🔮 Prediction Result")
         st.write(f"### Predicted Energy Consumption (kWh): {predicted_energy:.2f}")
 
 
-def model_comparison_page():
-    X_test_scaled = data[0]
-    y_test = data[1]
-
-    model_elastic = models[0]
-    model_linreg = models[1]
+def model_eval_page():
+    X_test_scaled, y_test = data[0], data[1]
     
-    y_pred_elastic = model_elastic.predict(X_test_scaled)
-    y_pred_linreg = model_linreg.predict(X_test_scaled)
+    # this list order based on the models order above
+    model_names = []
+    for x in range(len(models)):
+        match = re.search(r"([^/]+)$", MODELS_EP[x])
+        model_names.append(match.group(1).split(".")[0])
     
-    mse_linreg =  mean_squared_error(y_test, y_pred_linreg)
-    r2_linreg = r2_score(y_test, y_pred_linreg)
+    res = [{"name":name, "y_pred": model.predict(X_test_scaled)} for name, model in zip(model_names, models)]
     
-    mse_elastic =  mean_squared_error(y_test, y_pred_elastic)
-    r2_elastic = r2_score(y_test, y_pred_elastic)
+    for x in res:
+        x["mse"] = mean_squared_error(y_test, x["y_pred"])
+        x["r2"] = r2_score(y_test, x["y_pred"])
     
-    metrics = ["mse_linreg", "r2_linreg", "mse_elastic", "r2_elastic"]
-    values = [mse_linreg, r2_linreg, mse_elastic, r2_elastic]
+    metrics = [
+        f"mse_{x["name"].lower()}" for x in res
+    ] + [
+        f"r2_{x["name"].lower()}" for x in res
+    ]
+    
+    values = [
+        x["mse"] for x in res
+    ] + [
+        x["r2"] for x in res
+    ]
     
     # DF
-    res = pd.DataFrame({"Actual": y_test, "Pred_Linreg": y_pred_linreg, "Pred_Elastic": y_pred_elastic})
-    st.dataframe(res.sample(10, ignore_index=True))
+    df = pd.DataFrame({"Actual": y_test})
+    for x in res:
+        df[f"pred_{x["name"]}"] = x["y_pred"]
+    
+    st.dataframe(df.sample(10, ignore_index=True))
     
     # FIG
     fig, ax = plt.subplots()
     ax.bar(metrics, values)
     ax.set_title("Model Eval Metrics")
-    ax.set_ylabel("Score")
+    plt.xticks(rotation=90)
     for i, v in enumerate(values):
         ax.text(i, v + 0.02, f"{v:.4f}", ha='center')
     st.pyplot(fig)
@@ -150,4 +164,4 @@ if __name__ == "__main__":
     if selected == menus[0]:
         forecast_page()
     if selected == menus[1]:
-        model_comparison_page()
+        model_eval_page()
