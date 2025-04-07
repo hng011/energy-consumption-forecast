@@ -54,7 +54,7 @@ def forecast_page():
 
 
     # Choosing Model
-    list_model = ["LinearRegression", "ElasticNet", "Lasso"]
+    list_model = ["LinearRegression", "ElasticNet", "Lasso", "Ridge"]
     choosed_model = st.selectbox("Model", list_model)
 
 
