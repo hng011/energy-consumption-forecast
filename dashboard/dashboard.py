@@ -15,6 +15,9 @@ MODELS_EP = [
         "https://github.com/hng011/energy-consumption-forecast/raw/refs/heads/main/models/model_linreg_fnb1.joblib",
         "https://github.com/hng011/energy-consumption-forecast/raw/refs/heads/main/models/model_elastic_fnb1.joblib",
         "https://github.com/wicaksonohanif/FGD_ATA_2425_Regression/raw/refs/heads/main/models/model_lasso.joblib",
+        "https://github.com/hng011/energy-consumption-forecast/raw/refs/heads/main/models/model_ridge.joblib",
+
+
         
     ]
 
