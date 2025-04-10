@@ -149,7 +149,7 @@ def model_eval_page():
     ax.set_title("Model Eval Metrics")
     plt.xticks(rotation=90)
     for i, v in enumerate(values):
-        ax.text(i, v + 0.02, f"{v:.4f}", ha='center')
+        ax.text(i, v + 0.02, f"{v:.2f}", ha='center')
     st.pyplot(fig)
 
 
