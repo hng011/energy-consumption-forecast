@@ -12,13 +12,10 @@ from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 
 
 MODELS_EP = [
-        "https://github.com/hng011/energy-consumption-forecast/raw/refs/heads/main/models/model_linreg_fnb1.joblib",
-        "https://github.com/hng011/energy-consumption-forecast/raw/refs/heads/main/models/model_elastic_fnb1.joblib",
+        # "https://github.com/hng011/energy-consumption-forecast/raw/refs/heads/main/models/model_linreg_fnb1.joblib",
+        "https://github.com/hng011/energy-consumption-forecast/raw/refs/heads/main/models/model_elasticnet.joblib",
         "https://github.com/wicaksonohanif/FGD_ATA_2425_Regression/raw/refs/heads/main/models/model_lasso.joblib",
-        "https://github.com/hng011/energy-consumption-forecast/raw/refs/heads/main/models/model_ridge.joblib",
-
-
-        
+        "https://github.com/hng011/energy-consumption-forecast/raw/refs/heads/main/models/model_ridge.joblib",        
     ]
 
 SCALER_EP = "https://github.com/hng011/energy-consumption-forecast/raw/refs/heads/main/models/scaler_standardscaler_fnb1.joblib"
@@ -54,7 +51,11 @@ def forecast_page():
 
 
     # Choosing Model
-    list_model = ["LinearRegression", "ElasticNet", "Lasso", "Ridge"]
+    list_model = [
+        # "LinearRegression", 
+        "ElasticNet", 
+        "Lasso", 
+        "Ridge"]
     choosed_model = st.selectbox("Model", list_model)
 
 
