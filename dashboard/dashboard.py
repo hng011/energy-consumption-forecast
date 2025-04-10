@@ -12,13 +12,12 @@ from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 
 
 MODELS_EP = [
-        # "https://github.com/hng011/energy-consumption-forecast/raw/refs/heads/main/models/model_linreg_fnb1.joblib",
         "https://github.com/hng011/energy-consumption-forecast/raw/refs/heads/main/models/model_elasticnet.joblib",
-        "https://github.com/wicaksonohanif/FGD_ATA_2425_Regression/raw/refs/heads/main/models/model_lasso.joblib",
+        "https://github.com/hng011/energy-consumption-forecast/raw/refs/heads/main/models/model_lasso.joblib",
         "https://github.com/hng011/energy-consumption-forecast/raw/refs/heads/main/models/model_ridge.joblib",        
     ]
 
-SCALER_EP = "https://github.com/hng011/energy-consumption-forecast/raw/refs/heads/main/models/scaler_standardscaler_fnb1.joblib"
+SCALER_EP = "https://github.com/hng011/energy-consumption-forecast/raw/refs/heads/main/models/scaler_standardscaler.joblib"
 
 DATA_EP = [
     "https://github.com/hng011/energy-consumption-forecast/raw/refs/heads/main/models/X_test_scaled.npy",
@@ -31,6 +30,15 @@ models, data, scaler = load_assets(
     scaler_ep=SCALER_EP,
 )
 
+
+# def _test_eval():
+#     import joblib
+#     print(models[1])
+#     print(models[1].predict(data[0])[:5])
+#     model_lasso_local = joblib.load("../models/model_lasso.joblib") 
+#     print(model_lasso_local.predict(data[0])[:5])
+
+# _test_eval()
 
 def forecast_page():
     st.image("https://raw.githubusercontent.com/hng011/wok/refs/heads/main/assets/banner_linreg.png")
@@ -52,7 +60,6 @@ def forecast_page():
 
     # Choosing Model
     list_model = [
-        # "LinearRegression", 
         "ElasticNet", 
         "Lasso", 
         "Ridge"]
@@ -149,9 +156,8 @@ def model_eval_page():
     ax.set_title("Model Eval Metrics")
     plt.xticks(rotation=90)
     for i, v in enumerate(values):
-        ax.text(i, v + 0.02, f"{v:.2f}", ha='center')
+        ax.text(i, v + 0.02, f"{v:.4f}", ha='center')
     st.pyplot(fig)
-
 
 if __name__ == "__main__":
     menus = [
@@ -163,7 +169,7 @@ if __name__ == "__main__":
         try:
             selected = option_menu(menu_title="Dashboard Menu",
                 options=menus,
-                default_index=0
+                default_index=1
             )
         except:
             st.write("streamlit_option_menu module not found")
