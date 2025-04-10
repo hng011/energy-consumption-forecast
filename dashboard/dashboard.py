@@ -8,7 +8,7 @@ from utils import (
 )
  
 from streamlit_option_menu import option_menu 
-from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 
 
 MODELS_EP = [
@@ -117,18 +117,23 @@ def model_eval_page():
     for x in res:
         x["mse"] = mean_squared_error(y_test, x["y_pred"])
         x["r2"] = r2_score(y_test, x["y_pred"])
+        x["mae"] = mean_absolute_error(y_test, x["y_pred"])
     
     metrics = [
         f"mse_{x["name"].lower()}" for x in res
     ] + [
         f"r2_{x["name"].lower()}" for x in res
+    ] + [
+        f"mae_{x["name"].lower()}" for x in res
     ]
     
     values = [
         x["mse"] for x in res
     ] + [
         x["r2"] for x in res
-    ]
+    ] + [
+        x["mae"] for x in res
+    ] 
     
     # DF
     df = pd.DataFrame({"Actual": y_test})
