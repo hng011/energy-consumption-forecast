@@ -120,44 +120,35 @@ def model_eval_page():
         match = re.search(r"([^/]+)$", MODELS_EP[x])
         model_names.append(match.group(1).split(".")[0])
     
+    
+    # res[0]["name"] = model_elasticnet
+    # res[1]["name"] = model_lasso
     res = [{"name":name, "y_pred": model.predict(X_test_scaled)} for name, model in zip(model_names, models)]
     
-    for x in res:
-        x["mse"] = mean_squared_error(y_test, x["y_pred"])
-        x["r2"] = r2_score(y_test, x["y_pred"])
-        x["mae"] = mean_absolute_error(y_test, x["y_pred"])
-    
-    metrics = [
-        f"mse_{x["name"].lower()}" for x in res
-    ] + [
-        f"r2_{x["name"].lower()}" for x in res
-    ] + [
-        f"mae_{x["name"].lower()}" for x in res
-    ]
-    
-    values = [
-        x["mse"] for x in res
-    ] + [
-        x["r2"] for x in res
-    ] + [
-        x["mae"] for x in res
-    ] 
     
     # DF
     df = pd.DataFrame({"Actual": y_test})
     for x in res:
         df[f"pred_{x["name"]}"] = x["y_pred"]
     
+    st.title("Predictions")
     st.dataframe(df.sample(10, ignore_index=True))
     
     # FIG
-    fig, ax = plt.subplots()
-    ax.bar(metrics, values)
-    ax.set_title("Model Eval Metrics")
-    plt.xticks(rotation=90)
-    for i, v in enumerate(values):
-        ax.text(i, v + 0.02, f"{v:.4f}", ha='center')
-    st.pyplot(fig)
+    list_metrics = [
+        "Mean Absolute Error", 
+        "Mean Squared Error", 
+        "R-Squared Error"
+    ]
+    
+    data_fig = [
+        {
+            "met_name":met_name, 
+            "model_names": [{"name": name} for name in model_names]
+        } 
+        for met_name in list_metrics
+    ]
+
 
 if __name__ == "__main__":
     menus = [
