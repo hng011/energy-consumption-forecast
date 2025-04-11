@@ -160,7 +160,7 @@ if __name__ == "__main__":
         try:
             selected = option_menu(menu_title="Dashboard Menu",
                 options=menus,
-                default_index=1
+                default_index=0
             )
         except:
             st.write("streamlit_option_menu module not found")
